@@ -12,6 +12,15 @@
 
 /* App include files */
 #include "data.hpp"
+#include "misc.hpp"
+#include "../../vendor/lbp.hpp"
+#include "../../vendor/helper.hpp"
+
+/* Extra include files */
+#include <sys/time.h>
+#include <fstream>
+#include <ctime>
+#include <cmath>
 
 /* Flags */
 #define KINECT 0

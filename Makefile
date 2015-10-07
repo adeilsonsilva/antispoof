@@ -16,7 +16,10 @@ LIBRARIES=-L$(OPENCV_PATH)/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -
 # Files which require compiling
 SOURCE_FILES=\
 	src/lib/data.cpp\
-    src/lib/validation.cpp
+    src/lib/validation.cpp\
+    src/lib/misc.cpp\
+    src/lib/helper.cpp\
+    src/lib/lbp.cpp
 
 # Source files which contain a int main(..) function
 SOURCE_FILES_WITH_MAIN=src/exe/faceAntispoof.cpp
