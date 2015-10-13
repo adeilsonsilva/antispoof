@@ -16,6 +16,10 @@
 #include <ctime>
 #include <sys/time.h>
 
+#include "../vendor/lbp.hpp"
+#include "../vendor/preprocessFace.hpp"
+#include "../vendor/detectObject.hpp"
+
 using namespace std;
 
 namespace FACEANTISPOOF
@@ -25,12 +29,15 @@ namespace FACEANTISPOOF
         public:
             misc();
 			~misc();
-            void saveHist(cv::Mat& hist);
+            string faceCascadeName, eyeCascadeName, eyeTreeCascadeName;
+            cv::CascadeClassifier faceCascade, eyeCascade, eyeTreeCascade;
             unsigned int framesCount;
+            unsigned int facesCount;
+            void saveHist(cv::Mat& hist);
+            void loadCascades();
 
         protected:
             typedef struct timeval TIME;
-            void saveHist(cv::Mat& hist, int frame);
             bool success;
             string outputFolderPath, outputFolderName, outputVideoName;
             TIME t, ct;
@@ -41,6 +48,7 @@ namespace FACEANTISPOOF
             void tset();
             double tget(TIME *t0, TIME *t1);
             void createFolders();
+            void saveHist(cv::Mat& hist, int frame);
     };
 }
 

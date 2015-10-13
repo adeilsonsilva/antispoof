@@ -19,7 +19,9 @@ SOURCE_FILES=\
     src/lib/validation.cpp\
     src/lib/misc.cpp\
     src/lib/helper.cpp\
-    src/lib/lbp.cpp
+    src/lib/lbp.cpp\
+    src/lib/detectObject.cpp\
+    src/lib/preprocessFace.cpp
 
 # Source files which contain a int main(..) function
 SOURCE_FILES_WITH_MAIN=src/exe/faceAntispoof.cpp

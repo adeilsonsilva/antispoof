@@ -14,20 +14,28 @@ using namespace std;
 
 namespace FACEANTISPOOF
 {
-	class data : public misc 
+	class data : public misc
     {
 		public:
 			data(string filename);
 			~data();
-			bool get(cv::Mat& outputImage);
+            cv::Mat image, face, faceLBP, faceHist;
+            cv::Mat detectedFace;
+			bool getImage();
 			bool isLoaded();
-            void saveImage(cv::Mat &image, std::string path, int imgCount);
+            void saveFrame();
+            void saveFace();
+            void saveDetectedFace();
+            void detectFace();
+            void getLBP();
+            void showFaces();
 
 		private:
 			string outputFilePath;
 			cv::VideoCapture inputVideoFile;
             cv::VideoWriter outputVideoFile;
 			bool loaded;
+            void saveImage();
 	};
 }
 
