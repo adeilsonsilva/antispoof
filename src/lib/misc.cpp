@@ -56,7 +56,7 @@ void misc::createFolders()
 	char resp;
 
 	std::cout << "Results will be saved at: /antispoofing/out/" << this->outputFolderName << std::endl;
-	command << "cd " << this->outputFolderPath << " && mkdir " << this->outputFolderName << " && cd " << this->outputFolderName << " && mkdir frames && mkdir faces && mkdir detectedFaces";
+	command << "cd " << this->outputFolderPath << " && mkdir " << this->outputFolderName << " && cd " << this->outputFolderName << " && mkdir frames && mkdir faces && mkdir LBP && mkdir detectedFaces";
 	commandStr = command.str();
 	commandStr_C = commandStr.c_str();
 	if(std::system(commandStr_C) != 0){
@@ -122,4 +122,15 @@ void misc::loadCascades()
          * exit(1);
          */
     }
+}
+
+void misc::saveImage(cv::Mat &image, std::string folder, int count){
+    std::string result;
+    std::stringstream sstm;
+
+    this->comPressParam.push_back(CV_IMWRITE_PNG_COMPRESSION);
+    this->comPressParam.push_back(5);
+    sstm << this->outputFolderPath << this->outputFolderName << folder << count << ".png";
+    result = sstm.str();
+    cv::imwrite(result, image, this->comPressParam);
 }

@@ -23,19 +23,19 @@ namespace FACEANTISPOOF
             cv::Mat detectedFace;
 			bool getImage();
 			bool isLoaded();
-            void saveFrame();
-            void saveFace();
-            void saveDetectedFace();
             void detectFace();
             void getLBP();
             void showFaces();
 
 		private:
-			string outputFilePath;
 			cv::VideoCapture inputVideoFile;
             cv::VideoWriter outputVideoFile;
+            string outputFilePath;
 			bool loaded;
-            void saveImage();
+            void saveFrame();
+            void saveDetectedFace();
+            void saveFace();
+            void saveFaceLBP();
 	};
 }
 

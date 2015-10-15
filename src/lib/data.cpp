@@ -31,40 +31,6 @@ bool data::isLoaded(){
 	return (this->loaded && this->success);
 }
 
-void data::saveFrame(){
-    std::string result;
-    std::stringstream sstm;
-
-    this->comPressParam.push_back(CV_IMWRITE_PNG_COMPRESSION);
-    this->comPressParam.push_back(5);
-    sstm << this->outputFolderPath << this->outputFolderName << "/frames/" << this->framesCount << ".png";
-    result = sstm.str();
-    cv::imwrite(result, this->image, this->comPressParam);
-}
-
-void data::saveFace(){
-    std::string result;
-    std::stringstream sstm;
-
-    this->comPressParam.push_back(CV_IMWRITE_PNG_COMPRESSION);
-    this->comPressParam.push_back(5);
-    sstm << this->outputFolderPath << this->outputFolderName << "/faces/" << this->facesCount << ".png";
-    result = sstm.str();
-    cv::imwrite(result, this->face, this->comPressParam);
-}
-
-void data::saveDetectedFace(){
-    std::string result;
-    std::stringstream sstm;
-
-    this->comPressParam.push_back(CV_IMWRITE_PNG_COMPRESSION);
-    this->comPressParam.push_back(5);
-    sstm << this->outputFolderPath << this->outputFolderName << "/detectedFaces/" << this->facesCount << ".png";
-    result = sstm.str();
-    cv::imwrite(result, this->detectedFace, this->comPressParam);
-}
-
-
 void data::detectFace()
 {
     /* Find a face and preprocess it to have a standard size and contrast & brightness. */
@@ -73,7 +39,7 @@ void data::detectFace()
     cv::Point leftEye, rightEye;    /* Position of the detected eyes. */
     cv::Mat processedFace;
 
-    processedFace = vendor::getPreprocessedFace(this->image, 70, this->faceCascade, this->eyeCascade, this->eyeTreeCascade, true, &faceRect, &leftEye, &rightEye, &searchedLeftEye, &searchedRightEye);
+    processedFace = vendor::getPreprocessedFace(this->image, 50, this->faceCascade, this->eyeCascade, this->eyeTreeCascade, true, &faceRect, &leftEye, &rightEye, &searchedLeftEye, &searchedRightEye);
 
     if(!processedFace.empty()){
         this->face = processedFace;
@@ -87,21 +53,39 @@ void data::detectFace()
     }
 }
 
-void data::showFaces()
-{
-    if(!this->face.empty()){
-        cv::imshow("Detected Face", this->detectedFace);
-        cv::imshow("Normalized Face", this->face);
-        cv::imshow("LBP Normalized Face", this->faceLBP);
-    }
-}
-
 void data::getLBP()
 {
     if(!this->face.empty()){
         libfacerec::olbp(this->face, this->faceLBP);
         this->faceHist = libfacerec::spatial_histogram(this->faceLBP, 59);
         this->saveHist(this->faceHist, this->facesCount);
+        this->saveFaceLBP();
+    }
+}
+
+void data::saveFrame(){
+    this->saveImage(this->image, "/frames/", this->framesCount);
+}
+
+void data::saveDetectedFace(){
+    this->saveImage(this->detectedFace, "/detectedFaces/", this->facesCount);
+}
+
+void data::saveFace(){
+    this->saveImage(this->face, "/faces/", this->facesCount);
+}
+
+void data::saveFaceLBP(){
+    this->saveImage(this->faceLBP, "/LBP/", this->facesCount);
+}
+
+void data::showFaces()
+{
+    cv::imshow("Video Stream", this->image);
+    if(!this->face.empty()){
+        cv::imshow("Detected Face", this->detectedFace);
+        cv::imshow("Normalized Face", this->face);
+        cv::imshow("LBP Normalized Face", this->faceLBP);
     }
 }
 

@@ -49,6 +49,7 @@ namespace FACEANTISPOOF
             double tget(TIME *t0, TIME *t1);
             void createFolders();
             void saveHist(cv::Mat& hist, int frame);
+            void saveImage(cv::Mat &image, std::string folder, int count);
     };
 }
 
