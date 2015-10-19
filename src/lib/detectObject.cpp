@@ -90,12 +90,12 @@ void vendor::detectLargestObject(const Mat &img, CascadeClassifier &cascade, Rec
     // Only search for just 1 object (the biggest in the image).
     int flags = CASCADE_FIND_BIGGEST_OBJECT;// | CASCADE_DO_ROUGH_SEARCH;
     // Smallest object size.
-    Size minFeatureSize = Size(20, 20);
+    Size minFeatureSize = Size();
     // How detailed should the search be. Must be larger than 1.0.
     float searchScaleFactor = 1.1f;
     // How much the detections should be filtered out. This should depend on how bad false detections are to your system.
     // minNeighbors=2 means lots of good+bad detections, and minNeighbors=6 means only good detections are given but some are missed.
-    int minNeighbors = 4;
+    int minNeighbors = 1;
 
     // Perform Object or Face Detection, looking for just 1 object (the biggest in the image).
     vector<Rect> objects;
