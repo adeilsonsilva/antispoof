@@ -54,13 +54,13 @@ Rect scaleRectFromCenter(const Rect wholeFaceRect, float scale)
 void vendor::detectBothEyes(const Mat &face, CascadeClassifier &eyeCascade1, CascadeClassifier &eyeCascade2, Point &leftEye, Point &rightEye, Rect *searchedLeftEye, Rect *searchedRightEye)
 {
     // Skip the borders of the face, since it is usually just hair and ears, that we don't care about.
-/*
+
     // For "2splits.xml": Finds both eyes in roughly 60% of detected faces, also detects closed eyes.
     const float EYE_SX = 0.12f;
     const float EYE_SY = 0.17f;
     const float EYE_SW = 0.37f;
     const float EYE_SH = 0.36f;
-*/
+
 /*
     // For mcs.xml: Finds both eyes in roughly 80% of detected faces, also detects closed eyes.
     const float EYE_SX = 0.10f;
@@ -68,13 +68,13 @@ void vendor::detectBothEyes(const Mat &face, CascadeClassifier &eyeCascade1, Cas
     const float EYE_SW = 0.40f;
     const float EYE_SH = 0.36f;
 */
-
+/*
     // For default eye.xml or eyeglasses.xml: Finds both eyes in roughly 40% of detected faces, but does not detect closed eyes.
     const float EYE_SX = 0.16f;
     const float EYE_SY = 0.26f;
     const float EYE_SW = 0.30f;
     const float EYE_SH = 0.28f;
-
+*/
     int leftX = cvRound(face.cols * EYE_SX);
     int topY = cvRound(face.rows * EYE_SY);
     int widthX = cvRound(face.cols * EYE_SW);
@@ -328,13 +328,12 @@ Mat vendor::getPreprocessedFace(Mat &srcImg, int desiredFaceWidth, CascadeClassi
             //imshow("dstImg", dstImg);
 
             return dstImg;
-        }
-        /*
-        else {
+        }/* else {
             // Since no eyes were found, just do a generic image resize.
-            resize(gray, tmpImg, Size(w,h));
-        }
-        */
+            Mat tmpImg = Mat(desiredFaceHeight, desiredFaceWidth, CV_8U, Scalar(128));
+            resize(gray, tmpImg, Size(desiredFaceWidth, desiredFaceHeight));
+            return tmpImg;
+        } */
     }
     return Mat();
 }

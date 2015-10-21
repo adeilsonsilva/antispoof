@@ -5,8 +5,8 @@ using namespace FACEANTISPOOF;
 misc::misc()
 {
     this->faceCascadeName = "../misc/haarcascade_frontalface_alt.xml";
-    this->eyeCascadeName = "../misc/haarcascade_eye.xml";
-    this->eyeTreeCascadeName = "../misc/haarcascade_eye_tree_eyeglasses.xml";
+    this->eyeCascadeName = "../misc/haarcascade_lefteye_2splits.xml";
+    this->eyeTreeCascadeName = "../misc/haarcascade_righteye_2splits.xml";
     this->outputFolderPath = "../out/";
     this->getTime();
     this->createFolders();
