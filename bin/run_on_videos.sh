@@ -9,10 +9,11 @@ do
         folder_name="Mask"
         session="03"
 
-	    folder="${folder_name}/0${i}_${session}_0${j}_${im_type}.avi"
+	    folder="0${i}_${session}_0${j}_${im_type}.avi"
 
+        echo "===================================================================="
+        echo "./faceAntispoof ${folder}"
 		./faceAntispoof ${folder}
-        #echo ${folder}
-        wait
+        sleep 30
 	done
 done
