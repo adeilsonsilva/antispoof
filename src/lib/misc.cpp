@@ -144,25 +144,26 @@ void misc::readHist()
 {
     std::string result;
     std::stringstream sstm;
+    cv::Mat tmpImg;
 
     for (int i = 1; i <= misc::NUM_FACES; i++)
     {
         sstm << "../misc/Histograms/Color/Face/histograms" << i << ".xml";
         result = sstm.str();
         this->inputXMLFile.open(result, cv::FileStorage::READ);
-        // inputXMLFile["Histograma"] >> tmpImg;
-        cv::FileNode n = inputXMLFile.root();                         // Read string sequence - Get node
-        if (n.type() != cv::FileNode::SEQ)
-        {
-            cerr << "strings is not a sequence! FAIL" << endl;
-            exit(1);
-        }
-        for(cv::FileNodeIterator current = n.begin(); current != n.end(); current++) {
-            cv::FileNode item = *current;
-            Mat tmpImg;
-            item["pose"] >> tmpImg;
-            this->Hists.push_back(tmpImg);
-        }
+        inputXMLFile["Histograma"] >> tmpImg;
+        // cv::FileNode n = inputXMLFile.root();                         // Read string sequence - Get node
+        // if (n.type() != cv::FileNode::SEQ)
+        // {
+        //     cerr << "strings is not a sequence! FAIL" << endl;
+        //     exit(1);
+        // }
+        // for(cv::FileNodeIterator current = n.begin(); current != n.end(); current++) {
+        //     cv::FileNode item = *current;
+        //     Mat tmpImg;
+        //     item["Histograma"] >> tmpImg;
+        //     this->Hists.push_back(tmpImg);
+        // }
         // tmpImg.release();
     }
 
