@@ -2,6 +2,7 @@
 
 int main(int argc, char const *argv[])
 {
+    /*
     std::cout << "Usage: ./faceAntispoof videoname" << std::endl;
     std::cout << "Press 'q' to quit!" << std::endl;
 
@@ -24,7 +25,10 @@ int main(int argc, char const *argv[])
         std::cout << "End of video!" << std::endl;
     }else{
         std::cout << "Error loading video file!" << std::endl;
-    }
+    } */
+
+    FACEANTISPOOF::data dataHelper;
+    dataHelper.trainSvm();
 
     return 0;
 }

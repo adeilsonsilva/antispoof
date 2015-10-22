@@ -2,6 +2,11 @@
 
 using namespace FACEANTISPOOF;
 
+const int misc::NUM_TRAINING_EXAMPLES = 31500; /* (70 real faces + 35 masks) * 300 frames */
+const int misc::NUM_FEATURES = 3776; /* Number of histograms columns */
+const int misc::NUM_FACES = 70;
+const int misc::NUM_MASKS = 35;
+
 misc::misc()
 {
     this->faceCascadeName = "../misc/haarcascade_frontalface_alt.xml";
@@ -133,4 +138,77 @@ void misc::saveImage(cv::Mat &image, std::string folder, int count){
     sstm << this->outputFolderPath << this->outputFolderName << folder << count << ".png";
     result = sstm.str();
     cv::imwrite(result, image, this->comPressParam);
+}
+
+void misc::readHist()
+{
+    std::string result;
+    std::stringstream sstm;
+
+    for (int i = 1; i <= misc::NUM_FACES; i++)
+    {
+        sstm << "../misc/Histograms/Color/Face/histograms" << i << ".xml";
+        result = sstm.str();
+        this->inputXMLFile.open(result, cv::FileStorage::READ);
+        // inputXMLFile["Histograma"] >> tmpImg;
+        cv::FileNode n = inputXMLFile.root();                         // Read string sequence - Get node
+        if (n.type() != cv::FileNode::SEQ)
+        {
+            cerr << "strings is not a sequence! FAIL" << endl;
+            exit(1);
+        }
+        for(cv::FileNodeIterator current = n.begin(); current != n.end(); current++) {
+            cv::FileNode item = *current;
+            Mat tmpImg;
+            item["pose"] >> tmpImg;
+            this->Hists.push_back(tmpImg);
+        }
+        // tmpImg.release();
+    }
+
+    // sstm.clear();
+    // for (int i = 1; i <= misc::NUM_MASKS; i++)
+    // {
+    //     sstm << "../misc/Histograms/Color/Mask/histograms" << i << ".xml";
+    //     result = sstm.str();
+    //     this->inputXMLFile.open(result, cv::FileStorage::READ);
+    //     inputXMLFile["Histograma"] >> tmpImg;
+    //     this->Hists.push_back(tmpImg);
+    //     // tmpImg.release();
+    // }
+}
+
+void misc::trainSvm()
+{
+    this->readHist();
+
+    cv::Mat training_data(misc::NUM_TRAINING_EXAMPLES, misc::NUM_FEATURES, CV_32FC1);
+    cv::Mat class_labels(misc::NUM_TRAINING_EXAMPLES, 1, CV_32FC1);
+
+    /* this->Hists.size() < misc::NUM_TRAINING_EXAMPLES */
+    for(unsigned int i = 0; i <= this->Hists.size(); i++)
+    {
+        for(unsigned int j = 0; j <= misc::NUM_FEATURES; j++)
+        {
+            std::cout << this->Hists.size() << std::endl;
+            training_data.at<float>(i, j) = this->Hists[i].at<float>(i, j);
+            /* Set 1 for faces an 0 for masks */
+            std::cout <<"bbbbbbbbb\n";
+            class_labels.at<float>(i, 0) = i <= NUM_FACES ? 1 : 0;
+        }
+    }
+
+    cv::Ptr<ml::SVM> svm = ml::SVM::create();
+    // svm->setType(ml::SVM::C_SVC);
+    // svm->setKernel(ml::SVM::LINEAR);
+    // svm->setGamma(3);
+    // params.coef0 = 1;
+    // params.degree = 2;
+    // params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, FLT_EPSILON);
+    // cv::CvSVM SVM;
+    Ptr<ml::TrainData> tData = ml::TrainData::create(training_data, ml::ROW_SAMPLE, class_labels);
+    // svm.train(training_data, class_labels, cv::Mat(), cv::Mat(), params);
+    svm->train(tData);
+    svm->save("../misc/svm_lbp_model.txt");
+    // fin_t.close();
 }

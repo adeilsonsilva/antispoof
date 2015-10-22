@@ -8,6 +8,11 @@ data::data(string filename)
 	this->loaded = this->inputVideoFile.isOpened();
 }
 
+data::data()
+{
+    this->loaded = false;
+}
+
 data::~data()
 {
     string finalText = cv::format("\n\nFrames Count: %d || Face Count: %d", this->framesCount, this->facesCount);

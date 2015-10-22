@@ -1,8 +1,8 @@
 /* Main class to handle data related stuff:
- * 		Read video files;
- *		Read images;
- *		Save video files;
- * 		Save FileStorage stuf;
+ *      Read video files;
+ *      Read images;
+ *      Save video files;
+ *      Save FileStorage stuf;
  */
 
 #ifndef DATA_HPP
@@ -14,29 +14,30 @@ using namespace std;
 
 namespace FACEANTISPOOF
 {
-	class data : public misc
+    class data : public misc
     {
-		public:
-			data(string filename);
-			~data();
+        public:
+            data(string filename);
+            data();
+            ~data();
             cv::Mat image, face, faceLBP, faceHist;
             cv::Mat detectedFace;
-			bool getImage();
-			bool isLoaded();
+            bool getImage();
+            bool isLoaded();
             void detectFace();
             void getLBP();
             void showFaces();
 
-		private:
-			cv::VideoCapture inputVideoFile;
+        private:
+            cv::VideoCapture inputVideoFile;
             cv::VideoWriter outputVideoFile;
             string outputFilePath;
-			bool loaded;
+            bool loaded;
             void saveFrame();
             void saveDetectedFace();
             void saveFace();
             void saveFaceLBP();
-	};
+    };
 }
 
 #endif
