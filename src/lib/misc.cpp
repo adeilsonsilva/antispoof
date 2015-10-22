@@ -92,8 +92,12 @@ void misc::saveHist(cv::Mat& hist)
 
 void misc::saveHist(cv::Mat& hist, int frame)
 {
-    this->outputXMLFile << "Face" << frame;
-    this->outputXMLFile << "Histograma" << hist;
+    std::string result;
+    std::stringstream sstm;
+    sstm << "Histogram_" << frame;
+    result = sstm.str();
+    // this->outputXMLFile << "Face" << frame;
+    this->outputXMLFile << result << hist;
 }
 
 /* Vendor function */
@@ -151,32 +155,27 @@ void misc::readHist()
         sstm << "../misc/Histograms/Color/Face/histograms" << i << ".xml";
         result = sstm.str();
         this->inputXMLFile.open(result, cv::FileStorage::READ);
-        inputXMLFile["Histograma"] >> tmpImg;
-        // cv::FileNode n = inputXMLFile.root();                         // Read string sequence - Get node
-        // if (n.type() != cv::FileNode::SEQ)
-        // {
-        //     cerr << "strings is not a sequence! FAIL" << endl;
-        //     exit(1);
-        // }
-        // for(cv::FileNodeIterator current = n.begin(); current != n.end(); current++) {
-        //     cv::FileNode item = *current;
-        //     Mat tmpImg;
-        //     item["Histograma"] >> tmpImg;
-        //     this->Hists.push_back(tmpImg);
-        // }
-        // tmpImg.release();
+        sstm.clear();
+        sstm << "Histogram_" << i;
+        result = sstm.str();
+        inputXMLFile[result] >> tmpImg;
+        this->Hists.push_back(tmpImg);
+        tmpImg.release();
     }
 
-    // sstm.clear();
-    // for (int i = 1; i <= misc::NUM_MASKS; i++)
-    // {
-    //     sstm << "../misc/Histograms/Color/Mask/histograms" << i << ".xml";
-    //     result = sstm.str();
-    //     this->inputXMLFile.open(result, cv::FileStorage::READ);
-    //     inputXMLFile["Histograma"] >> tmpImg;
-    //     this->Hists.push_back(tmpImg);
-    //     // tmpImg.release();
-    // }
+    sstm.clear();
+    for (int i = 1; i <= misc::NUM_MASKS; i++)
+    {
+        sstm << "../misc/Histograms/Color/Mask/histograms" << i << ".xml";
+        result = sstm.str();
+        this->inputXMLFile.open(result, cv::FileStorage::READ);
+        sstm.clear();
+        sstm << "Histogram_" << i;
+        result = sstm.str();
+        inputXMLFile[result] >> tmpImg;
+        this->Hists.push_back(tmpImg);
+        tmpImg.release();
+    }
 }
 
 void misc::trainSvm()
@@ -191,8 +190,8 @@ void misc::trainSvm()
     {
         for(unsigned int j = 0; j <= misc::NUM_FEATURES; j++)
         {
-            std::cout << this->Hists.size() << std::endl;
-            training_data.at<float>(i, j) = this->Hists[i].at<float>(i, j);
+            std::cout << this->Hists.size() << "i:" << i << std::endl;
+            // training_data.at<float>(i, j) = this->Hists[i].at<float>(i, j);
             /* Set 1 for faces an 0 for masks */
             std::cout <<"bbbbbbbbb\n";
             class_labels.at<float>(i, 0) = i <= NUM_FACES ? 1 : 0;
