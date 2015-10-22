@@ -1,0 +1,17 @@
+#!/bin/bash
+
+folder1=Histograms
+folder2=Real_w1
+i=1
+for d in ./*/ ; 
+    do 
+        if [ -d "$d" ]; then
+            cd "$d"
+            cp -T histograms.xml "../${folder1}/${folder2}/histograms${i}.xml"
+            cp -T results.txt "../${folder1}/${folder2}/results${i}.txt"
+            cd ..
+            true $(( i++ ))
+        fi
+    done
+
+
