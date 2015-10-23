@@ -94,3 +94,8 @@ void data::showFaces()
     }
 }
 
+void data::predict()
+{
+    this->predictSvm(this->faceHist);
+}
+

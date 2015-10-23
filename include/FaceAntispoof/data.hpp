@@ -27,6 +27,7 @@ namespace FACEANTISPOOF
             void detectFace();
             void getLBP();
             void showFaces();
+            void predict();
 
         private:
             cv::VideoCapture inputVideoFile;

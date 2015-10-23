@@ -50,34 +50,34 @@ void misc::tset()
 
 double misc::tget(TIME *t0, TIME *t1)
 {
-	return t1->tv_sec-t0->tv_sec+(t1->tv_usec-t0->tv_usec)*0.000001;
+    return t1->tv_sec-t0->tv_sec+(t1->tv_usec-t0->tv_usec)*0.000001;
 }
 
 void misc::createFolders()
 {
     std::string commandStr, resultsName;
-	const char* commandStr_C;
-	std::stringstream command, videoPath, resultsPath;
-	char resp;
+    const char* commandStr_C;
+    std::stringstream command, videoPath, resultsPath;
+    char resp;
 
-	std::cout << "Results will be saved at: /antispoofing/out/" << this->outputFolderName << std::endl;
-	command << "cd " << this->outputFolderPath << " && mkdir " << this->outputFolderName << " && cd " << this->outputFolderName << " && mkdir frames && mkdir faces && mkdir LBP && mkdir detectedFaces";
-	commandStr = command.str();
-	commandStr_C = commandStr.c_str();
-	if(std::system(commandStr_C) != 0){
+    std::cout << "Results will be saved at: /antispoofing/out/" << this->outputFolderName << std::endl;
+    command << "cd " << this->outputFolderPath << " && mkdir " << this->outputFolderName << " && cd " << this->outputFolderName << " && mkdir frames && mkdir faces && mkdir LBP && mkdir detectedFaces";
+    commandStr = command.str();
+    commandStr_C = commandStr.c_str();
+    if(std::system(commandStr_C) != 0){
        std::cout << "The folder " << this->outputFolderName << " already exists! Overwrite? [y/n]: ";
        std::cin >> resp;
         if(resp == 'n' || resp == 'N'){
             this->success = false;
             exit(1);
         }
-	}
+    }
 
-	videoPath << this->outputFolderPath << this->outputFolderName << "/video.avi";
-	this->outputVideoName = videoPath.str();
-	resultsPath << this->outputFolderPath << this->outputFolderName << "/results.txt";
-	resultsName = resultsPath.str();
-	this->resultsFile.open(resultsName.c_str());
+    videoPath << this->outputFolderPath << this->outputFolderName << "/video.avi";
+    this->outputVideoName = videoPath.str();
+    resultsPath << this->outputFolderPath << this->outputFolderName << "/results.txt";
+    resultsName = resultsPath.str();
+    this->resultsFile.open(resultsName.c_str());
     this->success = true;
 }
 
@@ -148,33 +148,46 @@ void misc::readHist()
 {
     std::string result;
     std::stringstream sstm;
-    cv::Mat tmpImg;
+    cv::Mat tmpImg(misc::NUM_TRAINING_EXAMPLES, misc::NUM_FEATURES, CV_32FC1);
 
     for (int i = 1; i <= misc::NUM_FACES; i++)
     {
+        sstm.clear();
         sstm << "../misc/Histograms/Color/Face/histograms" << i << ".xml";
         result = sstm.str();
         this->inputXMLFile.open(result, cv::FileStorage::READ);
-        sstm.clear();
-        sstm << "Histogram_" << i;
-        result = sstm.str();
-        inputXMLFile[result] >> tmpImg;
-        this->Hists.push_back(tmpImg);
-        tmpImg.release();
+
+        cv::FileNode features = this->inputXMLFile.root();
+        cv::FileNodeIterator it = features.begin(), it_end = features.end();
+        for (int count = 1; it != it_end; it++, count++)
+        {
+            sstm.clear();
+            sstm << "Histogram_" << count;
+            result = sstm.str();
+            this->inputXMLFile[result] >> tmpImg;
+            this->Hists.push_back(tmpImg);
+            // tmpImg.release();
+        }
     }
 
-    sstm.clear();
     for (int i = 1; i <= misc::NUM_MASKS; i++)
     {
+        sstm.clear();
         sstm << "../misc/Histograms/Color/Mask/histograms" << i << ".xml";
         result = sstm.str();
         this->inputXMLFile.open(result, cv::FileStorage::READ);
-        sstm.clear();
-        sstm << "Histogram_" << i;
-        result = sstm.str();
-        inputXMLFile[result] >> tmpImg;
-        this->Hists.push_back(tmpImg);
-        tmpImg.release();
+
+        cv::FileNode features = this->inputXMLFile.root();
+        cv::FileNodeIterator it = features.begin(), it_end = features.end();
+        for (int count = 1; it != it_end; it++, count++)
+        {
+            sstm.clear();
+            sstm << "Histogram_" << count;
+            result = sstm.str();
+            this->inputXMLFile[result] >> tmpImg;
+            this->Hists.push_back(tmpImg);
+            // tmpImg.release();
+        }
     }
 }
 
@@ -183,32 +196,31 @@ void misc::trainSvm()
     this->readHist();
 
     cv::Mat training_data(misc::NUM_TRAINING_EXAMPLES, misc::NUM_FEATURES, CV_32FC1);
-    cv::Mat class_labels(misc::NUM_TRAINING_EXAMPLES, 1, CV_32FC1);
+    cv::Mat class_labels(misc::NUM_TRAINING_EXAMPLES, 1, CV_32S);
 
-    /* this->Hists.size() < misc::NUM_TRAINING_EXAMPLES */
-    for(unsigned int i = 0; i <= this->Hists.size(); i++)
+    /* this->Hists.size() <= misc::NUM_TRAINING_EXAMPLES */
+    for(unsigned int i = 0; i < this->Hists.size(); i++)
     {
-        for(unsigned int j = 0; j <= misc::NUM_FEATURES; j++)
-        {
-            std::cout << this->Hists.size() << "i:" << i << std::endl;
-            // training_data.at<float>(i, j) = this->Hists[i].at<float>(i, j);
-            /* Set 1 for faces an 0 for masks */
-            std::cout <<"bbbbbbbbb\n";
-            class_labels.at<float>(i, 0) = i <= NUM_FACES ? 1 : 0;
-        }
+        training_data.push_back(this->Hists[i]);
+        /* Set 1 for faces an 0 for masks */
+        class_labels.at<float>(i, 0) = i <= NUM_FACES ? 1 : 0;
     }
 
-    cv::Ptr<ml::SVM> svm = ml::SVM::create();
-    // svm->setType(ml::SVM::C_SVC);
-    // svm->setKernel(ml::SVM::LINEAR);
-    // svm->setGamma(3);
-    // params.coef0 = 1;
-    // params.degree = 2;
-    // params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, FLT_EPSILON);
-    // cv::CvSVM SVM;
+    cv::Ptr<ml::SVM> my_svm = ml::SVM::create();
     Ptr<ml::TrainData> tData = ml::TrainData::create(training_data, ml::ROW_SAMPLE, class_labels);
-    // svm.train(training_data, class_labels, cv::Mat(), cv::Mat(), params);
-    svm->train(tData);
-    svm->save("../misc/svm_lbp_model.txt");
-    // fin_t.close();
+    std::cout << "Training SVM!" << std::endl;
+    my_svm->trainAuto(tData, true);
+    std::cout << "Saving SVM!" << std::endl;
+    my_svm->save("../misc/svm_lbp_model.txt");
 }
+
+void misc::loadSvm()
+{
+    this->my_svm = ml::StatModel::load<ml::SVM>("../misc/svm_lbp_model.xml");
+}
+
+void misc::predictSvm(cv::Mat& hist)
+{
+    std::cout << this->my_svm->predict(hist) << std::endl;
+}
+

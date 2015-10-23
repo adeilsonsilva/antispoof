@@ -37,12 +37,15 @@ namespace FACEANTISPOOF
             string faceCascadeName, eyeCascadeName, eyeTreeCascadeName;
             cv::CascadeClassifier faceCascade, eyeCascade, eyeTreeCascade;
             vector<cv::Mat> Hists;
+            cv::Ptr<ml::SVM> my_svm;
             unsigned int framesCount;
             unsigned int facesCount;
             void saveHist(cv::Mat& hist);
             void loadCascades();
             void readHist();
             void trainSvm();
+            void loadSvm();
+            void predictSvm(cv::Mat& hist);
 
         protected:
             typedef struct timeval TIME;
