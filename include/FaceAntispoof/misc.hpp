@@ -64,6 +64,9 @@ namespace FACEANTISPOOF
             void saveImage(cv::Mat &image, std::string folder, int count);
             static const int NUM_TRAINING_EXAMPLES;
             static const int NUM_FEATURES;
+            static const int NUM_FACES_SAMPLES;
+            static const int NUM_MASKS_SAMPLES;
+            static const int NUM_FRAMES;
             static const int NUM_FACES;
             static const int NUM_MASKS;
     };

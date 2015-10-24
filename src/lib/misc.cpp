@@ -4,6 +4,9 @@ using namespace FACEANTISPOOF;
 
 const int misc::NUM_TRAINING_EXAMPLES = 31500; /* (70 real faces + 35 masks) * 300 frames */
 const int misc::NUM_FEATURES = 3776; /* Number of histograms columns */
+const int misc::NUM_FACES_SAMPLES = 21000; /* Number of face histograms */
+const int misc::NUM_MASKS_SAMPLES = 10500; /* Number of mask histograms */
+const int misc::NUM_FRAMES = 300;
 const int misc::NUM_FACES = 70;
 const int misc::NUM_MASKS = 35;
 
@@ -148,68 +151,76 @@ void misc::readHist()
 {
     std::string result;
     std::stringstream sstm;
-    cv::Mat tmpImg(misc::NUM_TRAINING_EXAMPLES, misc::NUM_FEATURES, CV_32FC1);
+    cv::Mat tmpImg(1, misc::NUM_FEATURES, CV_32FC1);
 
-    for (int i = 1; i <= misc::NUM_FACES; i++)
+    /* Using half histograms for memory purposes */
+    for (int i = 1; i <= NUM_FACES/2; i++)
     {
         sstm.clear();
         sstm << "../misc/Histograms/Color/Face/histograms" << i << ".xml";
         result = sstm.str();
         this->inputXMLFile.open(result, cv::FileStorage::READ);
 
-        cv::FileNode features = this->inputXMLFile.root();
-        cv::FileNodeIterator it = features.begin(), it_end = features.end();
-        for (int count = 1; it != it_end; it++, count++)
+        for (int count = 1; count <= misc::NUM_FRAMES; count++)
         {
             sstm.clear();
             sstm << "Histogram_" << count;
             result = sstm.str();
             this->inputXMLFile[result] >> tmpImg;
             this->Hists.push_back(tmpImg);
+            // std::cout << "Faces i: " << i << " count: " << count << std::endl;
             // tmpImg.release();
         }
     }
+    std::cout << "Faces hist size: " << this->Hists.size() << std::endl;
 
-    for (int i = 1; i <= misc::NUM_MASKS; i++)
+    /* Using half histograms for memory purposes */
+    for (int i = 1; i <= misc::NUM_MASKS/2; i++)
     {
         sstm.clear();
         sstm << "../misc/Histograms/Color/Mask/histograms" << i << ".xml";
         result = sstm.str();
         this->inputXMLFile.open(result, cv::FileStorage::READ);
 
-        cv::FileNode features = this->inputXMLFile.root();
-        cv::FileNodeIterator it = features.begin(), it_end = features.end();
-        for (int count = 1; it != it_end; it++, count++)
+        for (int count = 1; count <= misc::NUM_FRAMES; count++)
         {
             sstm.clear();
             sstm << "Histogram_" << count;
             result = sstm.str();
             this->inputXMLFile[result] >> tmpImg;
             this->Hists.push_back(tmpImg);
+            // std::cout << "Masks i: " << i << " count: " << count << std::endl;
             // tmpImg.release();
         }
     }
+    std::cout << "Total size: " << this->Hists.size() << std::endl;
 }
 
 void misc::trainSvm()
 {
     this->readHist();
 
-    cv::Mat training_data(misc::NUM_TRAINING_EXAMPLES, misc::NUM_FEATURES, CV_32FC1);
-    cv::Mat class_labels(misc::NUM_TRAINING_EXAMPLES, 1, CV_32S);
+    cv::Mat training_data(this->Hists.size(), misc::NUM_FEATURES, CV_32FC1);
+    // cv::Mat training_data(this->Hists);
+    cv::Mat class_labels(this->Hists.size(), 1, CV_32SC1);
 
     /* this->Hists.size() <= misc::NUM_TRAINING_EXAMPLES */
     for(unsigned int i = 0; i < this->Hists.size(); i++)
     {
-        training_data.push_back(this->Hists[i]);
-        /* Set 1 for faces an 0 for masks */
-        class_labels.at<float>(i, 0) = i <= NUM_FACES ? 1 : 0;
+        cv::Mat test;
+        this->Hists[i].convertTo(test, CV_32FC1);
+        training_data.push_back(test);
     }
+
+    /* Set 1 for faces an 2 for masks */
+    class_labels.rowRange(0, misc::NUM_FACES_SAMPLES/2).setTo(1);
+    class_labels.rowRange(misc::NUM_FACES_SAMPLES/2, this->Hists.size()).setTo(2);
 
     cv::Ptr<ml::SVM> my_svm = ml::SVM::create();
     Ptr<ml::TrainData> tData = ml::TrainData::create(training_data, ml::ROW_SAMPLE, class_labels);
-    std::cout << "Training SVM!" << std::endl;
-    my_svm->trainAuto(tData, true);
+    std::cout << "Training SVM with " << training_data.rows << " samples!" << std::endl;
+    // my_svm->trainAuto(tData);
+    my_svm->train(tData);
     std::cout << "Saving SVM!" << std::endl;
     my_svm->save("../misc/svm_lbp_model.txt");
 }
