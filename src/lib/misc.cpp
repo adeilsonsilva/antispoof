@@ -154,7 +154,7 @@ void misc::readHist()
     cv::Mat tmpImg(1, misc::NUM_FEATURES, CV_32FC1);
 
     /* Using half histograms for memory purposes */
-    for (int i = 1; i <= NUM_FACES/2; i++)
+    for (int i = 1; i <= NUM_FACES/1.5; i++)
     {
         sstm.clear();
         sstm << "../misc/Histograms/Color/Face/histograms" << i << ".xml";
@@ -175,7 +175,7 @@ void misc::readHist()
     std::cout << "Faces hist size: " << this->Hists.size() << std::endl;
 
     /* Using half histograms for memory purposes */
-    for (int i = 1; i <= misc::NUM_MASKS/2; i++)
+    for (int i = 1; i <= misc::NUM_MASKS/1.5; i++)
     {
         sstm.clear();
         sstm << "../misc/Histograms/Color/Mask/histograms" << i << ".xml";
@@ -216,10 +216,16 @@ void misc::trainSvm()
     class_labels.rowRange(0, misc::NUM_FACES_SAMPLES/2).setTo(1);
     class_labels.rowRange(misc::NUM_FACES_SAMPLES/2, this->Hists.size()).setTo(2);
 
-    cv::ml::SVM::Params my_params;
-    my_params.svmType = cv::ml::SVM::C_SVC;
-    my_params.kernelType = cv::ml::SVM::LINEAR;
-    cv::Ptr<ml::SVM> my_svm = ml::SVM::create(my_params);
+    /* OpenCV 2.4.x */
+    /*
+     *   cv::ml::SVM::Params my_params;
+     *   my_params.svmType = cv::ml::SVM::C_SVC;
+     *   my_params.kernelType = cv::ml::SVM::LINEAR;
+     *   cv::Ptr<ml::SVM> my_svm = ml::SVM::create(my_params);
+     */
+    Ptr<ml::SVM> my_svm = ml::SVM::create();
+    my_svm->setType(ml::SVM::C_SVC);
+    my_svm->setKernel(cv::ml::SVM::LINEAR);
     Ptr<ml::TrainData> tData = ml::TrainData::create(training_data, ml::ROW_SAMPLE, class_labels);
     std::cout << "Training SVM with " << training_data.rows << " samples!" << std::endl;
     // my_svm->trainAuto(tData);

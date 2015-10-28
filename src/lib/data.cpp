@@ -44,17 +44,17 @@ void data::detectFace()
     cv::Point leftEye, rightEye;    /* Position of the detected eyes. */
     cv::Mat processedFace;
 
-    // processedFace = vendor::getPreprocessedFace(this->image, 50, this->faceCascade, this->eyeCascade, this->eyeTreeCascade, true, &faceRect, &leftEye, &rightEye, &searchedLeftEye, &searchedRightEye);
+    processedFace = vendor::getPreprocessedFace(this->image, 50, this->faceCascade, this->eyeCascade, this->eyeTreeCascade, true, &faceRect, &leftEye, &rightEye, &searchedLeftEye, &searchedRightEye);
 
-    std::vector<Rect> faces;
-    cv::Mat frame_gray;
+    // std::vector<Rect> faces;
+    // cv::Mat frame_gray;
 
-    cvtColor( this->image, frame_gray, CV_BGR2GRAY );
-    equalizeHist( frame_gray, frame_gray );
+    // cvtColor( this->image, frame_gray, CV_BGR2GRAY );
+    // equalizeHist( frame_gray, frame_gray );
 
-    //-- Detect faces
-    this->faceCascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CASCADE_FIND_BIGGEST_OBJECT, Size(30, 30) );
-    processedFace = frame_gray(faces[0]);
+    // //-- Detect faces
+    // this->faceCascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CASCADE_FIND_BIGGEST_OBJECT, Size(30, 30) );
+    // processedFace = frame_gray(faces[0]);
 
     if(!processedFace.empty()){
         this->face = processedFace;
