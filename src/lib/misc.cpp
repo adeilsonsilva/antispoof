@@ -207,16 +207,19 @@ void misc::trainSvm()
     /* this->Hists.size() <= misc::NUM_TRAINING_EXAMPLES */
     for(unsigned int i = 0; i < this->Hists.size(); i++)
     {
-        cv::Mat test;
-        this->Hists[i].convertTo(test, CV_32FC1);
-        training_data.push_back(test);
+        cv::Mat hist;
+        this->Hists[i].convertTo(hist, CV_32FC1);
+        training_data.push_back(hist);
     }
 
     /* Set 1 for faces an 2 for masks */
     class_labels.rowRange(0, misc::NUM_FACES_SAMPLES/2).setTo(1);
     class_labels.rowRange(misc::NUM_FACES_SAMPLES/2, this->Hists.size()).setTo(2);
 
-    cv::Ptr<ml::SVM> my_svm = ml::SVM::create();
+    cv::ml::SVM::Params my_params;
+    my_params.svmType = cv::ml::SVM::C_SVC;
+    my_params.kernelType = cv::ml::SVM::LINEAR;
+    cv::Ptr<ml::SVM> my_svm = ml::SVM::create(my_params);
     Ptr<ml::TrainData> tData = ml::TrainData::create(training_data, ml::ROW_SAMPLE, class_labels);
     std::cout << "Training SVM with " << training_data.rows << " samples!" << std::endl;
     // my_svm->trainAuto(tData);
@@ -227,11 +230,15 @@ void misc::trainSvm()
 
 void misc::loadSvm()
 {
-    this->my_svm = ml::StatModel::load<ml::SVM>("../misc/svm_lbp_model.xml");
+    this->my_svm = cv::ml::SVM::load<ml::SVM>("../misc/svm_lbp_model.txt");
 }
 
-void misc::predictSvm(cv::Mat& hist)
+int misc::predictSvm(cv::Mat& hist)
 {
-    std::cout << this->my_svm->predict(hist) << std::endl;
+    std::cout << "Predicting with SVM!" << std::endl;
+    // std::cout << "Hist type: " << hist.type() << std::endl;
+    // std::cout << "Hist cols: " << hist.cols << std::endl;
+    // std::cout << "Hist rows: " << hist.rows << std::endl;
+    return this->my_svm->predict(hist);
 }
 

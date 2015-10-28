@@ -45,7 +45,7 @@ namespace FACEANTISPOOF
             void readHist();
             void trainSvm();
             void loadSvm();
-            void predictSvm(cv::Mat& hist);
+            int predictSvm(cv::Mat& hist);
 
         protected:
             typedef struct timeval TIME;
