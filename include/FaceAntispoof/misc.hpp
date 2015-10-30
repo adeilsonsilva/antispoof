@@ -25,11 +25,13 @@
 #include "../vendor/preprocessFace.hpp"
 #include "../vendor/detectObject.hpp"
 
+#include <Kinect/load.hpp>
+
 using namespace std;
 
 namespace FACEANTISPOOF
 {
-    class misc
+    class misc : public KINECT::load
     {
         public:
             misc();

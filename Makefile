@@ -21,7 +21,8 @@ SOURCE_FILES=\
     src/lib/helper.cpp\
     src/lib/lbp.cpp\
     src/lib/detectObject.cpp\
-    src/lib/preprocessFace.cpp
+    src/lib/preprocessFace.cpp\
+    src/lib/load.cpp
 
 # Source files which contain a int main(..) function
 SOURCE_FILES_WITH_MAIN=src/exe/faceAntispoof.cpp
@@ -46,8 +47,8 @@ all: bin/faceAntispoof
 
 -include $(DEPENDENCY_FILES)
 
-bin/faceAntispoof: $(ALL_OBJECTS)
-	$(CXX) $(LDFLAGS)  -o $@ $(ALL_OBJECTS) $(LIBRARIES) `pkg-config --cflags --libs opencv`
+bin/faceAntispoof: $(ALL_OBJECTS)		
+	$(CXX) $(LDFLAGS)  -o $@ $(ALL_OBJECTS) $(LIBRARIES) `pkg-config --cflags --libs opencv` -lz -pthread -lpng -lX11 -lfreenect2
 
 .PHONY: clean
 clean:

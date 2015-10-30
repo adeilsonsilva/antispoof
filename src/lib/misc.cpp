@@ -23,6 +23,7 @@ misc::misc()
     this->outputXMLFile << "Data" << this->outputFolderName;
     this->framesCount = 0;
     this->facesCount = 0;
+    // new (this->kinectBuffer) Kinect::load();
 }
 
 misc::~misc()

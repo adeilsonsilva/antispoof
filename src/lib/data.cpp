@@ -24,10 +24,14 @@ data::~data()
 
 bool data::getImage()
 {
-	if(this->inputVideoFile.read(this->image)){
-        this->framesCount++;
-        this->saveFrame();
-        return true;
+    if(this->isLoaded()){
+    	if(this->inputVideoFile.read(this->image)){
+            this->framesCount++;
+            this->saveFrame();
+            return true;
+        }
+    }else{
+        return this->getFromKinect();
     }
     return false;
 }
@@ -124,5 +128,16 @@ void data::predict()
                 break;
         }
     }
+}
+
+bool data::getFromKinect()
+{
+    this->image = this->getFrame();
+    if(!this->image.empty()){
+        this->framesCount++;
+        this->saveFrame();
+        return true;
+    }
+    return false;
 }
 

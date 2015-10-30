@@ -24,6 +24,7 @@ namespace FACEANTISPOOF
             cv::Mat detectedFace;
             bool getImage();
             bool isLoaded();
+            bool getFromKinect();
             void detectFace();
             void getLBP();
             void showFaces();
