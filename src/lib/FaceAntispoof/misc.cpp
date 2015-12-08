@@ -9,8 +9,10 @@ const int misc::NUM_MASKS_SAMPLES = 10500; /* Number of mask histograms */
 const int misc::NUM_FRAMES = 300;
 const int misc::NUM_FACES = 70;
 const int misc::NUM_MASKS = 35;
+const int misc::LABEL_1 = 1;
+const int misc::LABEL_2 = 2;
 
-misc::misc()
+misc::misc() : kinectBuffer()
 {
     this->faceCascadeName = "../misc/haarcascade_frontalface_alt.xml";
     this->eyeCascadeName = "../misc/haarcascade_lefteye_2splits.xml";
@@ -23,7 +25,6 @@ misc::misc()
     this->outputXMLFile << "Data" << this->outputFolderName;
     this->framesCount = 0;
     this->facesCount = 0;
-    // new (this->kinectBuffer) Kinect::load();
 }
 
 misc::~misc()
@@ -214,8 +215,8 @@ void misc::trainSvm()
     }
 
     /* Set 1 for faces an 2 for masks */
-    class_labels.rowRange(0, misc::NUM_FACES_SAMPLES/2).setTo(1);
-    class_labels.rowRange(misc::NUM_FACES_SAMPLES/2, this->Hists.size()).setTo(2);
+    class_labels.rowRange(0, misc::NUM_FACES_SAMPLES/2).setTo(misc::LABEL_1);
+    class_labels.rowRange(misc::NUM_FACES_SAMPLES/2, this->Hists.size()).setTo(misc::LABEL_2);
 
     /* OpenCV 2.4.x */
     /*

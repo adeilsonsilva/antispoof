@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
         while(dataHelper.getImage())
         {
             dataHelper.detectFace();
-            dataHelper.getLBP();
+            dataHelper.getLBP(true);
             dataHelper.predict();
             dataHelper.showFaces();
             int c = cvWaitKey(1);

@@ -26,13 +26,16 @@ namespace FACEANTISPOOF
             bool isLoaded();
             bool getFromKinect();
             void detectFace();
-            void getLBP();
+            void getLBP(bool vendor);
             void showFaces();
             void predict();
 
         private:
             cv::VideoCapture inputVideoFile;
             cv::VideoWriter outputVideoFile;
+            cv::Ptr<cv::face::FaceRecognizer> model;
+            std::vector<cv::Mat> userImages;
+            std::vector<int> userLabels;
             string outputFilePath;
             bool loaded;
             void saveFrame();

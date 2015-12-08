@@ -15,14 +15,14 @@ LIBRARIES=-L$(OPENCV_PATH)/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -
 
 # Files which require compiling
 SOURCE_FILES=\
-	src/lib/data.cpp\
-    src/lib/validation.cpp\
-    src/lib/misc.cpp\
-    src/lib/helper.cpp\
-    src/lib/lbp.cpp\
-    src/lib/detectObject.cpp\
-    src/lib/preprocessFace.cpp\
-    src/lib/load.cpp
+	src/lib/FaceAntispoof/data.cpp\
+    src/lib/FaceAntispoof/validation.cpp\
+    src/lib/FaceAntispoof/misc.cpp\
+    src/lib/Vendor/helper.cpp\
+    src/lib/Vendor/lbp.cpp\
+    src/lib/Vendor/detectObject.cpp\
+    src/lib/Vendor/preprocessFace.cpp\
+    src/lib/Kinect/load.cpp
 
 # Source files which contain a int main(..) function
 SOURCE_FILES_WITH_MAIN=src/exe/faceAntispoof.cpp
@@ -47,8 +47,8 @@ all: bin/faceAntispoof
 
 -include $(DEPENDENCY_FILES)
 
-bin/faceAntispoof: $(ALL_OBJECTS)		
-	$(CXX) $(LDFLAGS)  -o $@ $(ALL_OBJECTS) $(LIBRARIES) `pkg-config --cflags --libs opencv` -lz -pthread -lpng -lX11 -lfreenect2
+bin/faceAntispoof: $(ALL_OBJECTS)
+	$(CXX) $(LDFLAGS)  -o $@ $(ALL_OBJECTS) $(LIBRARIES) `pkg-config --cflags --libs opencv` -lz -pthread -lpng -lX11 -g #-lfreenect2
 
 .PHONY: clean
 clean:

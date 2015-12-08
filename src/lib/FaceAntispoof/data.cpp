@@ -6,6 +6,7 @@ data::data(string filename)
 {
 	this->inputVideoFile.open(filename);
 	this->loaded = this->inputVideoFile.isOpened();
+    this->model = cv::face::createLBPHFaceRecognizer();
 }
 
 data::data()
@@ -72,13 +73,23 @@ void data::detectFace()
     }
 }
 
-void data::getLBP()
+void data::getLBP(bool vendor)
 {
     if(!this->face.empty()){
-        libfacerec::olbp(this->face, this->faceLBP);
-        this->faceHist = libfacerec::spatial_histogram(this->faceLBP, 59);
+        if(vendor)
+        {
+            libfacerec::olbp(this->face, this->faceLBP);
+            this->faceHist = libfacerec::spatial_histogram(this->faceLBP, 5);
+            this->saveFaceLBP();
+        }else{
+            this->userLabels.push_back(misc::LABEL_1);
+            this->userImages.push_back(this->face);
+            this->model->train(userImages, this->userLabels);
+            this->userImages.clear();
+            this->userLabels.clear();
+            // this->faceHist = this->model->getMatVector("histograms");
+        }
         this->saveHist(this->faceHist, this->facesCount);
-        this->saveFaceLBP();
     }
 }
 
@@ -103,7 +114,7 @@ void data::showFaces()
     cv::imshow("Video Stream", this->image);
     if(!this->face.empty()){
         // cv::imshow("Detected Face", this->detectedFace);
-        // cv::imshow("Normalized Face", this->face);
+        cv::imshow("Normalized Face", this->face);
         // cv::imshow("LBP Normalized Face", this->faceLBP);
     }
 }
@@ -132,7 +143,7 @@ void data::predict()
 
 bool data::getFromKinect()
 {
-    this->image = this->getFrame();
+    this->image = this->kinectBuffer.getFrame();
     if(!this->image.empty()){
         this->framesCount++;
         this->saveFrame();
