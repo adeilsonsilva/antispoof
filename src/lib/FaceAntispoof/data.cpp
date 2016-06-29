@@ -4,6 +4,7 @@ using namespace FACEANTISPOOF;
 
 data::data(string filename)
 {
+    std::cout << filename << std::endl;
 	this->inputVideoFile.open(filename);
 	this->loaded = this->inputVideoFile.isOpened();
     this->model = cv::face::createLBPHFaceRecognizer();
@@ -11,6 +12,7 @@ data::data(string filename)
 
 data::data()
 {
+    std::cout << "filename" << std::endl;
     this->loaded = false;
 }
 
@@ -78,8 +80,8 @@ void data::getLBP(bool vendor)
     if(!this->face.empty()){
         if(vendor)
         {
-            libfacerec::olbp(this->face, this->faceLBP);
-            this->faceHist = libfacerec::spatial_histogram(this->faceLBP, 5);
+            lbpHandler.getImage(this->face, this->faceLBP);
+            this->faceHist = lbpHandler.describe(this->faceLBP);
             this->saveFaceLBP();
         }else{
             this->userLabels.push_back(misc::LABEL_1);
@@ -115,7 +117,7 @@ void data::showFaces()
     if(!this->face.empty()){
         // cv::imshow("Detected Face", this->detectedFace);
         cv::imshow("Normalized Face", this->face);
-        // cv::imshow("LBP Normalized Face", this->faceLBP);
+        cv::imshow("LBP Normalized Face", this->faceLBP);
     }
 }
 
@@ -151,4 +153,3 @@ bool data::getFromKinect()
     }
     return false;
 }
-

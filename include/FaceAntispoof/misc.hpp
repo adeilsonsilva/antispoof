@@ -22,7 +22,7 @@
 #include <ctime>
 #include <sys/time.h>
 
-#include "../vendor/lbp.hpp"
+#include "../vendor/lbph.hpp"
 #include "../vendor/preprocessFace.hpp"
 #include "../vendor/detectObject.hpp"
 
@@ -38,6 +38,7 @@ namespace FACEANTISPOOF
             misc();
 			~misc();
             KINECT::load kinectBuffer;
+            Lbph lbpHandler;
             string faceCascadeName, eyeCascadeName, eyeTreeCascadeName;
             cv::CascadeClassifier faceCascade, eyeCascade, eyeTreeCascade;
             vector<cv::Mat> Hists;

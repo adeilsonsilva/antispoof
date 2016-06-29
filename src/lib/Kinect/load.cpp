@@ -10,12 +10,12 @@ load::load()
 {
 	// this->dir = this->createStream("depth.log");
 	// this->ir = this->createStream("ir.log");
-	this->color = this->createStream("color.log");
+	// this->color = this->createStream((char*)"color.log");
 	// this->keyboard = this->createData("keyboard.log");
 	// this->mouse = this->createData("mouse.log");
 	// this->flag_dir = this->streamNext(dir);
 	// this->flag_ir = this->streamNext(ir);
-	this->flag_color = this->streamNext(this->color);
+	// this->flag_color = this->streamNext(this->color);
 	// this->flag_keyboard = this->dataNext(this->keyboard);
 	// this->flag_mouse = this->dataNext(mouse);
 }
@@ -220,4 +220,3 @@ Mat load::getFrame() {
 	}
 	return Mat();
 }
-

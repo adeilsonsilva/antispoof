@@ -12,7 +12,7 @@ const int misc::NUM_MASKS = 35;
 const int misc::LABEL_1 = 1;
 const int misc::LABEL_2 = 2;
 
-misc::misc() : kinectBuffer()
+misc::misc() : kinectBuffer(), lbpHandler()
 {
     this->faceCascadeName = "../misc/haarcascade_frontalface_alt.xml";
     this->eyeCascadeName = "../misc/haarcascade_lefteye_2splits.xml";
@@ -249,4 +249,3 @@ int misc::predictSvm(cv::Mat& hist)
     // std::cout << "Hist rows: " << hist.rows << std::endl;
     return this->my_svm->predict(hist);
 }
-

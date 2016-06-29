@@ -7,7 +7,7 @@ CXX=g++
 
 # Flags
 ARCH_FLAGS=
-CFLAGS=-Wextra -Wall -pedantic-errors $(ARCH_FLAGS) -O3 -Wno-long-long
+CFLAGS= -std=c++14 -Wextra -Wall -pedantic-errors $(ARCH_FLAGS) -O3 -Wno-long-long
 LDFLAGS=$(ARCH_FLAGS)
 DEFINES=
 INCLUDES=-I$(OPENCV_PATH)/include -Iinclude/
@@ -18,8 +18,7 @@ SOURCE_FILES=\
 	src/lib/FaceAntispoof/data.cpp\
     src/lib/FaceAntispoof/validation.cpp\
     src/lib/FaceAntispoof/misc.cpp\
-    src/lib/Vendor/helper.cpp\
-    src/lib/Vendor/lbp.cpp\
+    src/lib/Vendor/lbph.cpp\
     src/lib/Vendor/detectObject.cpp\
     src/lib/Vendor/preprocessFace.cpp\
     src/lib/Kinect/load.cpp

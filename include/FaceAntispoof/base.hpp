@@ -13,8 +13,7 @@
 /* App include files */
 #include "data.hpp"
 #include "misc.hpp"
-#include "../../vendor/lbp.hpp"
-#include "../../vendor/helper.hpp"
+#include "../../vendor/lbph.hpp"
 
 /* Extra include files */
 #include <sys/time.h>
