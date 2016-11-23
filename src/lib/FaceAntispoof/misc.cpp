@@ -3,14 +3,14 @@
 using namespace FACEANTISPOOF;
 
 const int misc::NUM_TRAINING_EXAMPLES = 31500; /* (70 real faces + 35 masks) * 300 frames */
-const int misc::NUM_FEATURES = 3776; /* Number of histograms columns */
+const int misc::NUM_FEATURES = 16384; /* Number of histograms columns */
 const int misc::NUM_FACES_SAMPLES = 21000; /* Number of face histograms */
 const int misc::NUM_MASKS_SAMPLES = 10500; /* Number of mask histograms */
 const int misc::NUM_FRAMES = 300;
 const int misc::NUM_FACES = 70;
 const int misc::NUM_MASKS = 35;
-const int misc::LABEL_1 = 1;
-const int misc::LABEL_2 = 2;
+const int misc::FACE_LABEL = 1;
+const int misc::MASK_LABEL = 2;
 
 misc::misc() : kinectBuffer(), lbpHandler()
 {
@@ -25,6 +25,7 @@ misc::misc() : kinectBuffer(), lbpHandler()
     this->outputXMLFile << "Data" << this->outputFolderName;
     this->framesCount = 0;
     this->facesCount = 0;
+    this->Hists.reserve(31500);
 }
 
 misc::~misc()
@@ -155,9 +156,9 @@ void misc::readHist()
     std::stringstream sstm;
     cv::Mat tmpImg(1, misc::NUM_FEATURES, CV_32FC1);
 
-    /* Using half histograms for memory purposes */
-    for (int i = 1; i <= NUM_FACES/1.5; i++)
+    for (int i = 1; i <= NUM_FACES; i++)
     {
+        sstm.str( std::string() );
         sstm.clear();
         sstm << "../misc/Histograms/Color/Face/histograms" << i << ".xml";
         result = sstm.str();
@@ -165,20 +166,22 @@ void misc::readHist()
 
         for (int count = 1; count <= misc::NUM_FRAMES; count++)
         {
+            sstm.str( std::string() );
             sstm.clear();
             sstm << "Histogram_" << count;
             result = sstm.str();
             this->inputXMLFile[result] >> tmpImg;
             this->Hists.push_back(tmpImg);
-            // std::cout << "Faces i: " << i << " count: " << count << std::endl;
-            // tmpImg.release();
+            tmpImg.release();
         }
     }
-    std::cout << "Faces hist size: " << this->Hists.size() << std::endl;
+    // std::cout << "Faces hist size: " << this->Hists.size() << std::endl;
+    this->inputXMLFile.release();
+    result.clear();
 
-    /* Using half histograms for memory purposes */
-    for (int i = 1; i <= misc::NUM_MASKS/1.5; i++)
+    for (int i = 1; i <= misc::NUM_MASKS; i++)
     {
+        sstm.str( std::string() );
         sstm.clear();
         sstm << "../misc/Histograms/Color/Mask/histograms" << i << ".xml";
         result = sstm.str();
@@ -186,40 +189,53 @@ void misc::readHist()
 
         for (int count = 1; count <= misc::NUM_FRAMES; count++)
         {
+            sstm.str( std::string() );
             sstm.clear();
             sstm << "Histogram_" << count;
             result = sstm.str();
             this->inputXMLFile[result] >> tmpImg;
             this->Hists.push_back(tmpImg);
-            // std::cout << "Masks i: " << i << " count: " << count << std::endl;
-            // tmpImg.release();
+            tmpImg.release();
         }
     }
-    std::cout << "Total size: " << this->Hists.size() << std::endl;
+    // std::cout << "Total size: " << this->Hists.size() << std::endl;
 }
 
 void misc::trainSvm()
 {
     this->readHist();
 
-    cv::Mat training_data(this->Hists.size(), misc::NUM_FEATURES, CV_32FC1);
-    // cv::Mat training_data(this->Hists);
-    cv::Mat class_labels(this->Hists.size(), 1, CV_32SC1);
+    // cv::Mat hist(1, misc::NUM_FEATURES, CV_32FC1);
+    // cv::Mat training_data;
+    cv::Mat class_labels(this->Hists.rows, 1, CV_32SC1);
 
     /* this->Hists.size() <= misc::NUM_TRAINING_EXAMPLES */
-    for(unsigned int i = 0; i < this->Hists.size(); i++)
-    {
-        cv::Mat hist;
-        this->Hists[i].convertTo(hist, CV_32FC1);
-        training_data.push_back(hist);
-    }
+    // int i = 0;
+    // while(this->Hists.size() > 0) {
+    //     this->Hists[0].copyTo(hist);
+    //     training_data.push_back(hist);
+    //     this->Hists.erase(this->Hists.begin(), this->Hists.begin() + 1);
+    //     hist.release();
+    //     // std::cout << this->Hists.size() << std::endl;
+    //     i++;
+    // }
+
+    // std::cout << "+" << i << std::endl; // a qtd de loops tá correta, mas o tamanho do 'training_data' continua errado
 
     /* Set 1 for faces an 2 for masks */
-    class_labels.rowRange(0, misc::NUM_FACES_SAMPLES/2).setTo(misc::LABEL_1);
-    class_labels.rowRange(misc::NUM_FACES_SAMPLES/2, this->Hists.size()).setTo(misc::LABEL_2);
+    class_labels.rowRange(0, misc::NUM_FACES_SAMPLES).setTo(misc::FACE_LABEL);
+    // for (int i = 0; i < misc::NUM_FACES_SAMPLES; i++) {
+    //     class_labels.row(i).setTo(cv::Scalar(misc::FACE_LABEL));
+    // }
+    class_labels.rowRange(misc::NUM_FACES_SAMPLES, this->Hists.rows).setTo(misc::MASK_LABEL);
+    // for (int i = misc::NUM_FACES_SAMPLES; i < this->Hists.size(); i++) {
+    //     class_labels.row(i).setTo(cv::Scalar(misc::MASK_LABEL));
+    // }
 
-    /* OpenCV 2.4.x */
-    /*
+    std::cout << this->Hists.rows << " " << class_labels.rows << std::endl;
+
+    /* OpenCV 2.4.x
+     *
      *   cv::ml::SVM::Params my_params;
      *   my_params.svmType = cv::ml::SVM::C_SVC;
      *   my_params.kernelType = cv::ml::SVM::LINEAR;
@@ -228,24 +244,25 @@ void misc::trainSvm()
     Ptr<ml::SVM> my_svm = ml::SVM::create();
     my_svm->setType(ml::SVM::C_SVC);
     my_svm->setKernel(cv::ml::SVM::LINEAR);
-    Ptr<ml::TrainData> tData = ml::TrainData::create(training_data, ml::ROW_SAMPLE, class_labels);
-    std::cout << "Training SVM with " << training_data.rows << " samples!" << std::endl;
-    // my_svm->trainAuto(tData);
-    my_svm->train(tData);
+    Ptr<ml::TrainData> tData = ml::TrainData::create(this->Hists, ml::ROW_SAMPLE, class_labels);
+    // std::cout << "Training SVM with " << this->Hists.rows << " samples!" << std::endl;
+    my_svm->trainAuto(tData);
+    // my_svm->train(tData);
     std::cout << "Saving SVM!" << std::endl;
     my_svm->save("../misc/svm_lbp_model.txt");
 }
 
 void misc::loadSvm()
 {
-    this->my_svm = cv::ml::SVM::load<ml::SVM>("../misc/svm_lbp_model.txt");
+    this->Svm = cv::ml::SVM::load("../misc/svm_lbp_model.txt");
 }
 
 int misc::predictSvm(cv::Mat& hist)
 {
-    std::cout << "Predicting with SVM!" << std::endl;
+    // std::cout << "Predicting with SVM!" << std::endl;
     // std::cout << "Hist type: " << hist.type() << std::endl;
     // std::cout << "Hist cols: " << hist.cols << std::endl;
+    // std::cout << "count: " << Svm->getVarCount() << std::endl;
     // std::cout << "Hist rows: " << hist.rows << std::endl;
-    return this->my_svm->predict(hist);
+    return this->Svm->predict(hist);
 }

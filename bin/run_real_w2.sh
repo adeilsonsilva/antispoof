@@ -12,7 +12,7 @@ while [ $i -le $maxAll ]
 	   j=1
 	   while [ $j -le $maxUser ]
 		   do
-				command="./faceAntispoof ${folder}/0${i}_${session}_0${j}_${type}.avi"
+				command="./faceAntispoof 3DMAD_Train_Set/${folder}/0${i}_${session}_0${j}_${type}.avi"
 				echo $command;
 				$command;
 				true $((j++))

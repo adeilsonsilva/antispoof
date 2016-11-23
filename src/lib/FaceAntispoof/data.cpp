@@ -12,16 +12,12 @@ data::data(string filename)
 
 data::data()
 {
-    std::cout << "filename" << std::endl;
     this->loaded = false;
 }
 
 data::~data()
 {
-    string finalText = cv::format("\n\nFrames Count: %d || Face Count: %d", this->framesCount, this->facesCount);
-    if(this->resultsFile.is_open()){
-        this->resultsFile << finalText;
-    }
+    // string finalText = cv::format("\n\nFrames Count: %d || Face Count: %d", this->framesCount, this->facesCount);
 	this->inputVideoFile.release();
 }
 
@@ -80,11 +76,12 @@ void data::getLBP(bool vendor)
     if(!this->face.empty()){
         if(vendor)
         {
+            // cvtColor( this->detectedFace, this->detectedFace, CV_BGR2GRAY );
             lbpHandler.getImage(this->face, this->faceLBP);
             this->faceHist = lbpHandler.describe(this->faceLBP);
             this->saveFaceLBP();
         }else{
-            this->userLabels.push_back(misc::LABEL_1);
+            this->userLabels.push_back(misc::FACE_LABEL);
             this->userImages.push_back(this->face);
             this->model->train(userImages, this->userLabels);
             this->userImages.clear();
@@ -114,11 +111,11 @@ void data::saveFaceLBP(){
 void data::showFaces()
 {
     cv::imshow("Video Stream", this->image);
-    if(!this->face.empty()){
+    // if(!this->face.empty()){
         // cv::imshow("Detected Face", this->detectedFace);
-        cv::imshow("Normalized Face", this->face);
-        cv::imshow("LBP Normalized Face", this->faceLBP);
-    }
+        // cv::imshow("Normalized Face", this->face);
+        // cv::imshow("LBP Normalized Face", this->faceLBP);
+    // }
 }
 
 void data::predict()
@@ -129,17 +126,21 @@ void data::predict()
         this->faceHist.convertTo(this->faceHist, CV_32FC1);
         type = this->predictSvm(this->faceHist);
 
-        switch(type){
-            case 1:
-                std::cout << "Face!" << std::endl;
-                break;
-            case 2:
-                std::cout << "Mask!" << std::endl;
-                break;
-            default:
-                std::cout << "Unkown!" << std::endl;
-                break;
+        if(this->resultsFile.is_open()){
+            this->resultsFile << this->framesCount << " " << type << std::endl;
         }
+
+        // switch(type){
+        //     case 1:
+        //         std::cout << "Face!" << std::endl;
+        //         break;
+        //     case 2:
+        //         std::cout << "Mask!" << std::endl;
+        //         break;
+        //     default:
+        //         std::cout << "Unknown!" << std::endl;
+        //         break;
+        // }
     }
 }
 

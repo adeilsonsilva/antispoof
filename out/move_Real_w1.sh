@@ -1,7 +1,7 @@
 #!/bin/bash
 
-folder1=Histograms
-folder2=Real_w1
+folder2=Histograms
+folder1=Real_w1
 i=1
 for d in ./*/ ; 
     do 

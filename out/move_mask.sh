@@ -1,7 +1,7 @@
 #!/bin/bash
 
-folder1=Histograms
-folder2=Mask
+folder2=Histograms
+folder1=Mask
 i=1
 for d in ./*/ ; 
     do 

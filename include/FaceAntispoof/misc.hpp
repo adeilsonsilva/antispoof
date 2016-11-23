@@ -12,7 +12,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/opencv.hpp>
- #include <opencv2/highgui.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/face.hpp>
 #include <string>
@@ -36,13 +36,13 @@ namespace FACEANTISPOOF
     {
         public:
             misc();
-			~misc();
+            ~misc();
             KINECT::load kinectBuffer;
             Lbph lbpHandler;
             string faceCascadeName, eyeCascadeName, eyeTreeCascadeName;
             cv::CascadeClassifier faceCascade, eyeCascade, eyeTreeCascade;
-            vector<cv::Mat> Hists;
-            cv::Ptr<ml::SVM> my_svm;
+            cv::Mat Hists;
+            cv::Ptr<ml::SVM> Svm;
             unsigned int framesCount;
             unsigned int facesCount;
             void saveHist(cv::Mat& hist);
@@ -74,8 +74,8 @@ namespace FACEANTISPOOF
             static const int NUM_FRAMES;
             static const int NUM_FACES;
             static const int NUM_MASKS;
-            static const int LABEL_1;
-            static const int LABEL_2;
+            static const int FACE_LABEL;
+            static const int MASK_LABEL;
     };
 }
 
